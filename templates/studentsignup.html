@@ -1,0 +1,159 @@
+                                                          <!DOCTYPE html>
+<html>
+<head>
+    <title>Student Signup</title>
+    <style>
+        * {
+    font-family: 'Courier New', Courier, monospace;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    height: 100vh;
+    background: url("/Images/loginbg.jpg") no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.container {
+    background: rgba(179, 235, 176, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+
+h2 {
+    color: #2e7d32;
+    margin-bottom: 20px;
+}
+
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #81c784;
+}
+
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #388e3c;
+}
+
+
+.role-btn {
+    width: 120px;
+    margin: 10px;
+}
+
+
+.forgot {
+    margin-top: 10px;
+    color: #206523;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background: rgb(189, 254, 147);
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 12px;
+    position: relative;
+    text-align: center;
+}
+
+
+.close {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    color: rgb(21, 20, 20);
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🧒 Student Signup</h2>
+
+    <input type="text" id="sname" placeholder="Name">
+    <input type="text" id="sclass" placeholder="Class">
+    <input type="email" id="semail" placeholder="Email (@gmail.com only)">
+    <input type="password" id="spassword" placeholder="Password">
+
+    <button onclick="validateSignup()">Sign Up</button>
+
+    <div class="forgot">
+        Already have account? <a href="student.html">Login</a>
+    </div>
+</div>
+
+<script>
+function validateSignup() {
+
+    let name = document.getElementById("sname").value.trim();
+    let studentClass = document.getElementById("sclass").value.trim();
+    let email = document.getElementById("semail").value.trim();
+    let password = document.getElementById("spassword").value.trim();
+
+    let emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    let passwordPattern = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[\W]).{8,}$/;
+
+    if(name === "" || studentClass === "" || email === "" || password === ""){
+        alert("All fields are required!");
+        return;
+    }
+
+    if(!emailPattern.test(email)){
+        alert("Enter valid Gmail address (example@gmail.com)");
+        return;
+    }
+
+    if(!passwordPattern.test(password)){
+        alert("Password must be 8+ characters, include 1 Capital, 1 Number & 1 Special Character.");
+        return;
+    }
+
+    alert("Signup Successful!");
+}
+</script>
+
+</body>
+</html>
