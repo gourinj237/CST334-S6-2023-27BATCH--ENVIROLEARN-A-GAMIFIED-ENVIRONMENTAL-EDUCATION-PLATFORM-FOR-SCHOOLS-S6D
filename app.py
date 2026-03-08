@@ -402,12 +402,18 @@ def puzzle_leaderboard():
 def games_leaderboard():
     users = User.query.filter_by(role="student").all()
     rows = []
+
     for u in users:
         g = u.game_xp()
         q = u.quiz_xp()
         v = u.video_xp()
         c = u.challenge_xp()
+
         total = g + q + v + c
+
+        # use the reward function
+        reward = get_reward(c)
+
         rows.append({
             'name': u.name,
             'student_class': u.student_class or '—',
@@ -416,11 +422,15 @@ def games_leaderboard():
             'video_xp': v,
             'challenge_xp': c,
             'total': total,
+            'reward': reward,
             'is_me': u.id == current_user.id
         })
+
     rows.sort(key=lambda x: x['total'], reverse=True)
+
     for i, row in enumerate(rows):
         row['rank'] = i + 1
+
     return render_template("leaderboard.html", leaderboard=rows)
 
 
@@ -522,7 +532,7 @@ def teacherviewreport():
             'status':           sub.status,
             'reward_enabled':   sub.reward_enabled,
             'teacher_feedback': sub.teacher_feedback or '',
-            'points':           sub.points if sub.points else CHALLENGE_CATALOGUE.get(sub.challenge_id, {}).get('points', 50),
+            'points': CHALLENGE_CATALOGUE.get(sub.challenge_id, {}).get('points', 50),
         })
 
     class_avg = round(sum(s['total'] for s in student_data) / len(student_data), 1) if student_data else 0
@@ -806,13 +816,28 @@ def allowed_file(filename):
 
 
 def save_photo(file, user_id, label):
-    ext      = file.filename.rsplit(".", 1)[1].lower()
+    ext = file.filename.rsplit(".", 1)[1].lower()
     filename = f"user{user_id}_{label}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.{ext}"
-    path     = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(path)
-    # Always return forward-slash path so it works as a URL
-    return path.replace("\\", "/")
 
+    path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(path)
+
+    # Return browser-friendly URL
+    return f"/static/uploads/{filename}"
+
+def get_reward(points):
+    if points >= 50:
+        return "🏆🌍"
+    elif points >= 40:
+        return "🥇"
+    elif points >= 30:
+        return "🥈"
+    elif points >= 20:
+        return "🥉"
+    elif points >= 10:
+        return "🌱"
+    else:
+        return "🍃"
 
 def award_badges(user_id, challenge_id):
     badge_key = BADGE_MAP.get(challenge_id)
