@@ -10,7 +10,7 @@ EnviroLearn is an interactive web-based platform designed to teach students abou
 * **Jerena Ann Jacob**
 * **Jyothika Sasi**
 * **Nandana S Nair**
-* 
+  
 ## Create Virtual Environment
 
 To run the project locally, create a Python virtual environment.
