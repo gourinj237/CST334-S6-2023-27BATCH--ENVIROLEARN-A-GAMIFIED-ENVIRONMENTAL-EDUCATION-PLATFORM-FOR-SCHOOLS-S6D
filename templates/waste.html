@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Waste Segregation Game</title>
+
     <style>
         html, body {
             height: 100%;
@@ -11,16 +12,14 @@
         body {
             font-family: 'Courier New', Courier, monospace;
             text-align: center;
-            background-image: url("/Images/back.png");
+            background-image: url("{{ url_for('static', filename='back.png') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
 
-        h1 {
-            margin-top: 20px;
-        }
+        h1 { margin-top: 20px; }
 
         #scoreBoard {
             font-size: 26px;
@@ -40,9 +39,7 @@
             transition: transform .2s;
         }
 
-        #wasteItem:hover {
-            transform: scale(1.12);
-        }
+        #wasteItem:hover { transform: scale(1.12); }
 
         #feedback {
             height: 24px;
@@ -57,30 +54,20 @@
             margin-top: 25px;
         }
 
-        .bin img {
-            width: 135px;
-        }
+        .bin img { width: 135px; }
 
         .bin {
             border-radius: 15px;
             padding: 10px;
         }
 
-        .bin.hovered {
-            background: #ecffe9;
-        }
+        .bin.hovered { background: #ecffe9; }
 
-        .hidden {
-            display: none;
-        }
+        .hidden { display: none; }
 
-        #finalScreen {
-            margin-top: 80px;
-        }
+        #finalScreen { margin-top: 80px; }
 
-        #finalScreen h2 {
-            font-size: 32px;
-        }
+        #finalScreen h2 { font-size: 32px; }
 
         button {
             font-family: 'Courier New', Courier, monospace;
@@ -93,9 +80,7 @@
             cursor: pointer;
         }
 
-        button:hover {
-            background: #1b5e20;
-        }
+        button:hover { background: #1b5e20; }
     </style>
 </head>
 
@@ -110,28 +95,25 @@
 <div id="gameArea">
 
     <div id="itemArea">
-        <p id="instruction">Drag this item to the correct bin</p>
-
+        <p>Drag this item to the correct bin</p>
         <img id="wasteItem" draggable="true">
-
         <p id="itemName"></p>
-
         <p id="feedback"></p>
     </div>
 
     <div id="bins">
         <div class="bin" data-type="dry">
-            <img src="/Images/blue.jpeg">
+            <img src="{{ url_for('static', filename='blue.jpeg') }}">
             <p>Dry Waste</p>
         </div>
 
         <div class="bin" data-type="wet">
-            <img src="/Images/green.jpeg">
+            <img src="{{ url_for('static', filename='green.jpeg') }}">
             <p>Wet Waste</p>
         </div>
 
         <div class="bin" data-type="ewaste">
-            <img src="/Images/red.jpeg">
+            <img src="{{ url_for('static', filename='red.jpeg') }}">
             <p>E-Waste</p>
         </div>
     </div>
@@ -140,20 +122,24 @@
 
 <div id="finalScreen" class="hidden">
     <h2 id="finalMessage"></h2>
+
     <button onclick="restartGame()">Play Again</button>
+    <button onclick="goBack()">Back to Games</button>
 </div>
 
 <script>
-    const items = [
-    {name:"Banana Peel", type:"wet", img:"/Images/banana.jpeg"},
-    {name:"Plastic Bottle", type:"dry", img:"/Images/bottle.jpeg"},
-    {name:"Old Mobile", type:"ewaste", img:"/Images/mobile.jpeg"},
-    {name:"Paper", type:"dry", img:"/Images/paper.jpeg"},
-    {name:"Vegetable Scraps", type:"wet", img:"/Images/veggies.jpeg"}
+
+const items = [
+    {name:"Banana Peel", type:"wet", img:"{{ url_for('static', filename='banana.jpeg') }}"},
+    {name:"Plastic Bottle", type:"dry", img:"{{ url_for('static', filename='bottle.jpeg') }}"},
+    {name:"Old Mobile", type:"ewaste", img:"{{ url_for('static', filename='mobile.jpeg') }}"},
+    {name:"Paper", type:"dry", img:"{{ url_for('static', filename='paper.jpeg') }}"},
+    {name:"Vegetable Scraps", type:"wet", img:"{{ url_for('static', filename='veggies.jpeg') }}"}
 ];
 
 let score = 0;
 let index = 0;
+let scoreSubmitted = false;
 
 const itemImg = document.getElementById("wasteItem");
 const itemName = document.getElementById("itemName");
@@ -205,13 +191,13 @@ bins.forEach(bin=>{
 
         scoreText.textContent = score;
         index++;
-
         setTimeout(loadItem, 900);
     });
 
 });
 
 function endGame(){
+
     document.getElementById("gameArea").style.display = "none";
 
     document.getElementById("finalMessage").innerHTML =
@@ -220,11 +206,29 @@ function endGame(){
         You helped protect our planet! ♻`;
 
     document.getElementById("finalScreen").classList.remove("hidden");
+
+    if(!scoreSubmitted){
+        sendScoreToBackend();
+        scoreSubmitted = true;
+    }
+}
+
+function sendScoreToBackend(){
+
+    const data = new FormData();
+    data.append("game_name", "Waste Segregation");
+    data.append("score", score);
+
+    fetch("/save-game-score", {
+        method: "POST",
+        body: data
+    });
 }
 
 function restartGame(){
     score = 0;
     index = 0;
+    scoreSubmitted = false;
     scoreText.textContent = score;
 
     document.getElementById("finalScreen").classList.add("hidden");
@@ -234,6 +238,11 @@ function restartGame(){
 }
 
 loadItem();
+
+function goBack(){
+    window.location.href = "{{ url_for('games') }}";
+}
+
 </script>
 
 </body>

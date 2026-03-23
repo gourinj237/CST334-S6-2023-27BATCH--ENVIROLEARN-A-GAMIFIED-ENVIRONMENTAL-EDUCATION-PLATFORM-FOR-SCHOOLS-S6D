@@ -17,13 +17,11 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-
-    background-image: url('/Images/carbon.jpg');
+    background-image: url("{{ url_for('static', filename='carbon.jpg') }}");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
-
 
 .container{
     background: rgba(255, 255, 255, 0.9);
@@ -49,12 +47,15 @@ p{
 }
 
 button{
-    padding:10px 20px;
-    margin:10px 0;
+    padding:12px 20px;
+    margin:10px 5px;
     border:none;
     border-radius:8px;
     cursor:pointer;
     font-size:16px;
+    background:#2d6a4f;
+    color:white;
+    width:100%;
 }
 
 .start-btn{
@@ -108,7 +109,9 @@ button{
 <div id="result" class="hidden">
     <h2 id="finalScore"></h2>
     <h3 id="reward"></h3>
-    <button class="start-btn" onclick="restartGame()">Play Again</button>
+
+    <button class="start-btn" onclick="playAgain()">🔄 Play Again</button>
+    <button class="option-btn" onclick="goBack()">⬅ Back to Games</button>
 </div>
 
 </div>
@@ -118,47 +121,41 @@ let score = 0;
 let currentQuestion = 0;
 
 const questions = [
-    {
-        question: "How do you go to school?",
-        options: [
-            { text: "Walk / Cycle 🚶‍♂️🚲", eco: true },
-            { text: "Car 🏎️", eco: false }
-        ]
+    { question: "How do you go to school?",
+      options: [
+        { text: "Car 🏎️", eco: false },
+        { text: "Walk / Cycle 🚶‍♂️🚲", eco: true }
+      ]
     },
-    {
-        question: "How long do you keep lights on?",
-        options: [
-            { text: "Switch off when not needed 💡", eco: true },
-            { text: "Leave them on all day 🔆", eco: false }
-        ]
+    { question: "How long do you keep lights on?",
+      options: [
+        { text: "Switch off when not needed 💡", eco: true },
+        { text: "Leave them on all day 🔆", eco: false }
+      ]
     },
-    {
-        question: "How do you carry water?",
-        options: [
-            { text: "Reusable bottle 🧴", eco: true },
-            { text: "Single-use plastic bottle 🥤", eco: false }
-        ]
+    { question: "How do you carry water?",
+      options: [
+        { text: "Reusable bottle 🧴", eco: true },
+        { text: "Single-use plastic bottle 🥤", eco: false }
+      ]
     },
-    {
-        question: "What do you do with waste?",
-        options: [
-            { text: "Separate and recycle ♻️", eco: true },
-            { text: "Throw everything together 🗑️", eco: false }
-        ]
+    { question: "What do you do with waste?",
+      options: [
+        { text: "Throw everything together 🗑️", eco: false },
+        { text: "Separate and recycle ♻️", eco: true },
+      ]
     },
-    {
-        question: "How often do you waste food?",
-        options: [
-            { text: "Finish all food 🍎", eco: true },
-            { text: "Waste food often 🍕", eco: false }
-        ]
+    { question: "How often do you waste food?",
+      options: [
+        { text: "Finish all food 🍎", eco: true },
+        { text: "Waste food often 🍕", eco: false }
+      ]
     },
-    {
-        question: "How do you cool your room?",
-        options: [
-            { text: "Use fan / natural air 🌬️", eco: true },
-            { text: "AC all the time ❄️", eco: false }
-        ]
+    { question: "How do you cool your room?",
+      options: [
+        { text: "AC all the time ❄️", eco: false },
+        { text: "Use fan / natural air 🌬️", eco: true },
+      ]
     }
 ];
 
@@ -221,26 +218,29 @@ function showResult(){
 
     document.getElementById("reward").innerText = rewardMessage;
 
-    fetch("/save_score", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ score: score })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data.message);
-    });
+    // Send score to backend
+    // Send score to backend
+fetch("{{ url_for('save_carbon_score') }}", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "score=" + score
+});
+   
 }
 
-function restartGame(){
+function playAgain(){
     score = 0;
     currentQuestion = 0;
-    document.getElementById("score").innerText = score;
 
+    document.getElementById("score").innerText = score;
     document.getElementById("result").classList.add("hidden");
     document.getElementById("instructions").classList.remove("hidden");
+}
+
+function goBack(){
+    window.location.href = "{{ url_for('games') }}";
 }
 </script>
 

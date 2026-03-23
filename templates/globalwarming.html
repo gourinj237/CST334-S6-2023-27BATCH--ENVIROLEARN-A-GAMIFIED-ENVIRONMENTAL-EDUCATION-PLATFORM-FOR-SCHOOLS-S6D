@@ -1,24 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Global Warming Video</title>
 
 <style>
 
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
 body{
-    margin:0;
     font-family:'Courier New', Courier, monospace;
     background:
         linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-        url("/Images/videoback.jpeg");
+        url("{{ url_for('static', filename='videoback.jpeg') }}");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
     min-height:100vh;
     color:white;
+    padding:20px;
 }
 
+.backBtn{
+    position:fixed;
+    top:20px;
+    right:20px;
+    background:#2ecc71;
+    color:white;
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+    z-index:1000;
+    transition:0.3s;
+}
+
+.backBtn:hover{
+    background:#27ae60;
+}
 
 .title{
     font-size:40px;
@@ -27,7 +52,6 @@ body{
     font-weight:bold;
 }
 
-
 .subtitle{
     font-size:20px;
     text-align:center;
@@ -35,24 +59,23 @@ body{
     font-weight:bold;
 }
 
-
 .videoBox{
     background:white;
     color:black;
-    width:700px;
-    margin:auto;
+    max-width:700px;
+    width:100%;
+    margin:0 auto 40px auto;
     padding:25px;
     border-radius:15px;
     box-shadow:0 4px 15px rgba(0,0,0,0.3);
     text-align:center;
 }
 
-
 video{
     width:100%;
+    height:auto;
     border-radius:10px;
 }
-
 
 .unlockBtn{
     margin-top:20px;
@@ -67,12 +90,10 @@ video{
     transition:0.3s;
 }
 
-
 .unlockBtn:hover{
     background:#27ae60;
     transform:scale(1.05);
 }
-
 
 #message{
     margin-top:15px;
@@ -80,24 +101,52 @@ video{
     color:red;
 }
 
-</style>
+@media (max-width:768px){
 
+    .title{
+        font-size:28px;
+        padding-top:60px;
+    }
+
+    .subtitle{
+        font-size:16px;
+    }
+
+    .videoBox{
+        padding:18px;
+    }
+
+    .unlockBtn{
+        font-size:16px;
+        padding:10px 20px;
+    }
+
+    .backBtn{
+        font-size:14px;
+        padding:8px 14px;
+    }
+}
+
+</style>
 </head>
 
 <body>
 
-<h1 class="title"> 🌍 Global Warming Awareness</h1>
+<button class="backBtn" onclick="goBack()">← Back</button>
+
+<h1 class="title">🌍 Global Warming Awareness</h1>
 
 <p class="subtitle">
-Watch the video completely to unlock the quiz
+Watch at least 80% of the video to unlock the quiz
 </p>
 
 <div class="videoBox">
 
-<h2>🌍 Learn about Global Warming </h2>
+<h2>🌍 Learn about Global Warming</h2>
 
 <video id="videoPlayer" controls>
-    <source src="globalwarming.mp4" type="video/mp4">
+    <source src="{{ url_for('static', filename='globalwarming.mp4') }}" type="video/mp4">
+    Your browser does not support the video tag.
 </video>
 
 <br>
@@ -112,19 +161,54 @@ Watch the video completely to unlock the quiz
 
 <script>
 
+let highestPercent = 0;
+let lastSavedPercent = 0;
+
+const video = document.getElementById("videoPlayer");
+
+video.addEventListener("timeupdate", function () {
+
+    if (video.duration > 0) {
+
+        let percent = Math.floor((video.currentTime / video.duration) * 100);
+
+        if (percent > highestPercent) {
+            highestPercent = percent;
+        }
+
+        // Save only every 5%
+        if (highestPercent >= lastSavedPercent + 5) {
+
+            lastSavedPercent = highestPercent;
+
+            const formData = new FormData();
+            formData.append("video_id", "2");  // Global Warming ID
+            formData.append("percent", highestPercent);
+
+            fetch("/save-video-progress", {
+                method: "POST",
+                body: formData
+            });
+        }
+    }
+});
+
 function unlockQuiz()
 {
-    var video = document.getElementById("videoPlayer");
-
-    if(video.currentTime < video.duration - 2)
+    if (highestPercent < 80)
     {
         document.getElementById("message").innerHTML =
-        "⚠ Please watch full video first!";
+        "⚠ Please watch at least 80% of the video!";
     }
     else
     {
-        window.location.href = "globalwarming_quiz.html";
+        window.location.href = "{{ url_for('globalwarming_quiz') }}";
     }
+}
+
+function goBack()
+{
+    window.location.href = "{{ url_for('videos') }}";
 }
 
 </script>

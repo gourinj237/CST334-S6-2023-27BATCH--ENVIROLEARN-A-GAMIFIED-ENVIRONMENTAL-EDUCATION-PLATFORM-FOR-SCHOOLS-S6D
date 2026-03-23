@@ -1,42 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🌫 Pollution Quiz</title>
 
 <style>
 
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
 body{
-    margin:0;
     font-family:'Courier New', Courier, monospace;
     background:
     linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-    url("/Images/new1.jpeg");
+    url("{{ url_for('static', filename='new1.jpeg') }}");
     background-size:cover;
     background-position:center;
+    background-repeat:no-repeat;
     min-height:100vh;
     color:white;
+    padding:20px;
 }
-
 
 .title{
     font-size:40px;
     text-align:center;
-    padding-top:30px;
+    padding-top:20px;
 }
-
 
 .quizBox{
     background:white;
-  
     color:black;
-    width:700px;
+    max-width:700px;
+    width:100%;
     margin:40px auto;
     padding:30px;
     border-radius:15px;
     box-shadow:0 5px 15px rgba(0,0,0,0.3);
 }
-
 
 .timer{
     font-size:20px;
@@ -45,13 +50,11 @@ body{
     text-align:right;
 }
 
-
 .question{
     font-size:22px;
     font-weight:bold;
     margin-bottom:20px;
 }
-
 
 .option{
     background:#f1f1f1;
@@ -59,12 +62,20 @@ body{
     margin:10px 0;
     border-radius:8px;
     cursor:pointer;
+    transition:0.3s;
 }
 
 .option:hover{
     background:#dff5e1;
 }
 
+.correct{
+    background:#b7f5c5 !important;
+}
+
+.wrong{
+    background:#f5b7b7 !important;
+}
 
 .result{
     text-align:center;
@@ -76,12 +87,47 @@ body{
     font-size:60px;
 }
 
-</style>
+@media (max-width:768px){
+    .title{font-size:28px;}
+    .quizBox{padding:20px;margin:20px auto;}
+    .question{font-size:18px;}
+    .option{font-size:14px;padding:10px;}
+    .timer{font-size:16px;}
+    .result{font-size:20px;}
+    .emoji{font-size:45px;}
+}
 
+/* Top Right Back Button */
+.top-right{
+    position:absolute;
+    top:20px;
+    right:30px;
+}
+
+.back-btn{
+    background:white;
+    color:#2ecc71;
+    padding:10px 18px;
+    font-size:16px;
+    font-weight:bold;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    transition:0.3s;
+}
+
+.back-btn:hover{
+    background:#e8fff1;
+    transform:scale(1.05);
+}
+</style>
 </head>
 
 <body>
-
+<div class="top-right">
+    <button class="back-btn" onclick="goBack()">⬅ Back</button>
+</div>
 <h1 class="title">🌫 Pollution Quiz</h1>
 
 <div class="quizBox" id="quizBox">
@@ -91,13 +137,13 @@ Time Left: <span id="time">30</span>s
 </div>
 
 <div id="question" class="question"></div>
-
 <div id="options"></div>
 
 </div>
 
 <script>
 
+// ================= QUIZ DATA =================
 
 var quiz=[
 
@@ -138,118 +184,146 @@ var score=0;
 var timeLeft=30;
 var timer;
 
+// ================= TIMER =================
 
 function startTimer()
 {
-timeLeft=30;
-document.getElementById("time").innerHTML=timeLeft;
+    timeLeft=30;
+    document.getElementById("time").innerHTML=timeLeft;
 
-timer=setInterval(function(){
+    timer=setInterval(function(){
+        timeLeft--;
+        document.getElementById("time").innerHTML=timeLeft;
 
-timeLeft--;
-document.getElementById("time").innerHTML=timeLeft;
+        if(timeLeft==0)
+        {
+            clearInterval(timer);
+            index++;
+            nextQuestion();
+        }
 
-if(timeLeft==0)
-{
-clearInterval(timer);
-index++;
-nextQuestion();
+    },1000);
 }
 
-},1000);
-}
-
+// ================= LOAD QUESTION =================
 
 function loadQuestion()
 {
-clearInterval(timer);
+    clearInterval(timer);
 
-document.getElementById("question").innerHTML=quiz[index].question;
+    document.getElementById("question").innerHTML=quiz[index].question;
 
-var optionsHTML="";
+    var optionsHTML="";
 
-for(var i=0;i<quiz[index].options.length;i++)
-{
-optionsHTML+="<div class='option' onclick='checkAnswer("+i+")'>"
-+quiz[index].options[i]+"</div>";
+    for(var i=0;i<quiz[index].options.length;i++)
+    {
+        optionsHTML+=
+        "<div class='option' onclick='checkAnswer("+i+")'>"+
+        quiz[index].options[i]+"</div>";
+    }
+
+    document.getElementById("options").innerHTML=optionsHTML;
+
+    startTimer();
 }
 
-document.getElementById("options").innerHTML=optionsHTML;
-
-startTimer();
-}
-
+// ================= CHECK ANSWER =================
 
 function checkAnswer(selected)
 {
-clearInterval(timer);
+    clearInterval(timer);
 
-if(selected==quiz[index].answer)
-{
-score+=10;
+    var options=document.getElementsByClassName("option");
+
+    if(selected==quiz[index].answer)
+    {
+        options[selected].classList.add("correct");
+        score+=10;
+    }
+    else
+    {
+        options[selected].classList.add("wrong");
+        options[quiz[index].answer].classList.add("correct");
+    }
+
+    for(var i=0;i<options.length;i++)
+    {
+        options[i].style.pointerEvents="none";
+    }
+
+    setTimeout(function(){
+        index++;
+        nextQuestion();
+    },1000);
 }
 
-index++;
-nextQuestion();
-}
-
+// ================= NEXT QUESTION =================
 
 function nextQuestion()
 {
-if(index<quiz.length)
-{
-loadQuestion();
-}
-else
-{
-showResult();
-}
+    if(index<quiz.length)
+    {
+        loadQuestion();
+    }
+    else
+    {
+        showResult();
+    }
 }
 
+// ================= SHOW RESULT =================
 
 function showResult()
 {
-var message="";
+    sendScoreToBackend();   // 🔥 SEND SCORE
 
-if(score<30)
+    var message="";
+
+    if(score<30)
+    {
+        message=`
+        <div class="result">
+        <div class="emoji">🌍😢</div>
+        Your Score: ${score} / 50 <br><br>
+        Best try! Try again next time.<br>
+        Protect Earth and keep learning 🌱
+        </div>
+        `;
+    }
+    else
+    {
+        message=`
+        <div class="result">
+        <div class="emoji">🏆🌍😊</div>
+        Your Score: ${score} / 50 <br><br>
+        Congratulations!<br>
+        You are an Earth Protector! 🌱
+        </div>
+        `;
+    }
+
+    document.getElementById("quizBox").innerHTML=message;
+}
+
+// ================= SEND SCORE TO BACKEND =================
+
+function sendScoreToBackend()
 {
-message=`
-<div class="result">
+    const data = new FormData();
+    data.append("video_id", "1");   // Pollution video ID
+    data.append("score", score);
 
-<div class="emoji">🌍😢</div>
-
-Your Score: ${score} / 50 <br><br>
-
-Best try! Try again next time.<br>
-
-Protect Earth and keep learning 🌱
-
-</div>
-`;
-}
-else
-{
-message=`
-<div class="result">
-
-<div class="emoji">🏆🌍😊</div>
-
-Your Score: ${score} / 50 <br><br>
-
-Congratulations!<br>
-
-You are an Earth Protector! 🌱
-
-</div>
-`;
+    fetch("/submit-quiz-score", {
+        method: "POST",
+        body: data
+    });
 }
 
-document.getElementById("quizBox").innerHTML=message;
-}
-
-
+// START QUIZ
 loadQuestion();
-
+function goBack(){
+    window.location.href = "{{ url_for('videos') }}";
+}
 </script>
 
 </body>

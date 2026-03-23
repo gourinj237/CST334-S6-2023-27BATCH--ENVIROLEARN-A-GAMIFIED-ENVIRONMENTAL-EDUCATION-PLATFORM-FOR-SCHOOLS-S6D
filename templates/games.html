@@ -13,7 +13,7 @@
         .menuBG{
             background:
                 linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),
-                url("/Images/gamebg.png");
+                url("{{ url_for('static', filename='gamebg.png') }}");
             background-size:cover;
             background-position:center;
             background-repeat:no-repeat;
@@ -119,29 +119,93 @@
         .option:hover{
             background:#dff5e1;
         }
+
+        /* Top Right Dropdown */
+.top-right{
+    position:absolute;
+    top:20px;
+    right:30px;
+}
+
+.dropdown{
+    position:relative;
+    display:inline-block;
+}
+
+.dropbtn{
+    background:white;
+    color:#2ecc71;
+    padding:10px 18px;
+    font-size:16px;
+    font-weight:bold;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.dropbtn:hover{
+    background:#e8fff1;
+}
+
+.dropdown-content{
+    display:none;
+    position:absolute;
+    right:0;
+    background:white;
+    min-width:150px;
+    box-shadow:0 8px 16px rgba(0,0,0,0.2);
+    border-radius:8px;
+    overflow:hidden;
+    z-index:1;
+}
+
+.dropdown-content a{
+    color:#222;
+    padding:12px 16px;
+    text-decoration:none;
+    display:block;
+    font-weight:bold;
+}
+
+.dropdown-content a:hover{
+    background:#e8fff1;
+}
+
+.dropdown:hover .dropdown-content{
+    display:block;
+}
     </style>
 </head>
 
 <body class="menuBG">
 
+<div class="top-right">
+    <div class="dropdown">
+        <button class="dropbtn">☰</button>
+        <div class="dropdown-content">
+            <a href="{{ url_for('index') }}">🏠 Home</a>
+            <a href="{{ url_for('home') }}">🚪 Logout</a>
+        </div>
+    </div>
+</div>
 <h1 class="title">🌍 Eco Games</h1>
 <p class="subtitle">Choose a game and learn how to help the planet!</p>
 
 <div class="gameGrid">
 
-<div class="gameCard" onclick="location.href='waste.html'">
+<div class="gameCard" onclick="location.href='{{ url_for('waste') }}'">
 🌱 Waste Segregation Game
 </div>
 
-<div class="gameCard" onclick="location.href='carbon.html'">
+<div class="gameCard" onclick="location.href='{{ url_for('carbon') }}'">
 ♻️ Carbon Footprint Calculator
 </div>
 
-<div class="gameCard" onclick="location.href='ocean.html'">
+<div class="gameCard" onclick="location.href='{{ url_for('ocean') }}'">
 🌊 Clean the Ocean
 </div>
 
-<div class="gameCard" onclick="location.href='puzzle.html'">
+<div class="gameCard" onclick="location.href='{{ url_for('puzzle') }}'">
 🚀 Eco Puzzle
 </div>
 

@@ -115,7 +115,9 @@ def teacher_login():
         return redirect(url_for('teacher_login'))
     return render_template("teacher.html")
 
-
+@app.route('/about')
+def about():
+    return render_template('about.html')
 # ── MAIN PAGES ───────────────────────────────────────────────────
 
 @app.route('/index')
