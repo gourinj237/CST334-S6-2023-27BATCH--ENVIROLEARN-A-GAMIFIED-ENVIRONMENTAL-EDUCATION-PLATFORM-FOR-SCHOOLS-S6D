@@ -6,6 +6,16 @@ EnviroLearn is an interactive web-based platform designed to teach students abou
 
 Live Demo: https://cst334-s6-2023-27batch-envirolearn-a.onrender.com
 
+## Tech Stacks
+
+* **HTML**
+* **CSS**
+* **JavaScript**
+* **Flask**
+* **GeoLocation API**
+* **SQLite**
+* **SQLAlchemy**
+
 ## Team Members
 
 * **Gouri Nandana J**
